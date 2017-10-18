@@ -17,14 +17,18 @@
 package com.example.android.tvleanback.presenter;
 
 import android.content.res.Resources;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v17.leanback.widget.ImageCardView;
 import android.support.v17.leanback.widget.Presenter;
 import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
 import com.example.android.tvleanback.R;
+import com.example.android.tvleanback.model.Item;
 import com.example.android.tvleanback.model.Video;
 
 /*
@@ -69,24 +73,38 @@ public class CardPresenter extends Presenter {
 
     @Override
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object item) {
-        Video video = (Video) item;
+        Item video = (Item) item;
 
         ImageCardView cardView = (ImageCardView) viewHolder.view;
-        cardView.setTitleText(video.title);
-        cardView.setContentText(video.studio);
+        cardView.setTitleText(video.getTitle());
+        cardView.setContentText(video.getParentalGuidance());
 
-        if (video.cardImageUrl != null) {
-            // Set card size from dimension resources.
-            Resources res = cardView.getResources();
-            int width = res.getDimensionPixelSize(R.dimen.card_width);
-            int height = res.getDimensionPixelSize(R.dimen.card_height);
-            cardView.setMainImageDimensions(width, height);
+        // generate a colour
+        String color = String.format("#FF%06X", (0xFFFFFF & video.getTitle().hashCode()));
+        cardView.setMainImage(new ColorDrawable(Color.parseColor(color)));
+        Resources res = cardView.getResources();
+//        int height = res.getDimensionPixelSize(R.dimen.card_width);
+//        int width = res.getDimensionPixelSize(R.dimen.card_height);
+//        cardView.setMainImageDimensions(width, height);
+        cardView.setMainImageDimensions(200, 300);
 
-            Glide.with(cardView.getContext())
-                    .load(video.cardImageUrl)
+        Glide.with(cardView.getContext())
+                    .load(String.format("https://iflix-images.akamaized.net/%s_s_200x300", video.getImagePackId()))
                     .error(mDefaultCardImage)
                     .into(cardView.getMainImageView());
-        }
+
+//        if (!TextUtils.isEmpty(video.getImagePackId())) {
+//            // Set card size from dimension resources.
+//            Resources res = cardView.getResources();
+//            int width = res.getDimensionPixelSize(R.dimen.card_width);
+//            int height = res.getDimensionPixelSize(R.dimen.card_height);
+//            cardView.setMainImageDimensions(width, height);
+//
+//            Glide.with(cardView.getContext())
+//                    .load(video.cardImageUrl)
+//                    .error(mDefaultCardImage)
+//                    .into(cardView.getMainImageView());
+//        }
     }
 
     @Override
